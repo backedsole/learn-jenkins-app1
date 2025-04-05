@@ -58,11 +58,9 @@ pipeline {
                 ./node_modules/.bin/netlify --version
                 ./node_modules/.bin/netlify status
                 echo "Deploying to $NETLIFY_SITE_ID token: $NETLIFY_AUTH_TOKEN"
-
+                ./node_modules/.bin/netlify deploy --dir=build --prod
                 '''
             }
         }
     }
-
-
 }
