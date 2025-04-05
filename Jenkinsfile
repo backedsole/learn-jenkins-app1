@@ -1,6 +1,12 @@
 pipeline {
     agent any
 
+    environment {
+        NETLIFY_SITE_ID = '6abdadaf-58c4-4992-bfa9-f1a566e8ce00'
+        NETLIFY_AUTH_TOKEN = credentials('netlify-token')
+    }
+
+
     stages {
         stage('Build') {
             agent {
@@ -28,9 +34,14 @@ pipeline {
             }
             steps {
                 sh '''
-                    test -f build/index.html
+                    #test -f build/index.html
                     npm test
                 '''
+            }
+            post {
+                always {
+                    junit 'test-results/junit.xml'
+                }
             }
         }
         stage('Deploy') {
@@ -42,21 +53,16 @@ pipeline {
             }
             steps {
                 sh '''
-                ls -la
-                node --version
-                npm --version
                 npx netlify-cli --version
-                #npm install netlify-cli
-                
+                npm install netlify-cli
+                ./node_modules/.bin/netlify --version
+                ./node_modules/.bin/netlify status
+                echo "Deploying to $NETLIFY_SITE_ID token: $NETLIFY_AUTH_TOKEN"
 
                 '''
             }
         }
     }
 
-    post {
-        always {
-            junit 'test-results/junit.xml'
-        }
-    }
+
 }
